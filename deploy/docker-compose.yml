@@ -1,0 +1,38 @@
+version: '3.8'
+
+services:
+  xsis-test-backend:
+    container_name: xsis-test-backend
+    build:
+      context: ../
+      dockerfile: deploy/Dockerfile
+    depends_on:
+      - xsis-test-database
+    networks:
+      - xsis-network-backend
+    ports:
+      - "${APP_PORT}:${APP_PORT}"
+    environment:
+      APP_PORT: ${APP_PORT}
+      SQL_HOST: xsis-test-database
+      SQL_PORT: ${SQL_PORT}
+      SQL_USER: ${SQL_USER}
+      SQL_PASS: ${SQL_PASS}
+      SQL_DB: ${SQL_DB}
+
+  xsis-test-database:
+    container_name: xsis-test-database
+    image: mysql:5
+    networks:
+      - xsis-network-backend
+    environment:
+      MYSQL_DATABASE: ${SQL_DB}
+      MYSQL_USER: ${SQL_USER}
+      MYSQL_PASSWORD: ${SQL_PASS}
+      MYSQL_ROOT_PASSWORD: ${SQL_PASS}
+    volumes:
+      - ../docs/database.sql:/docker-entrypoint-initdb.d/schema.sql:ro
+
+
+networks:
+  xsis-network-backend:
